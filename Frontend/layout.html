@@ -1,0 +1,332 @@
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+
+    <style>
+      body {
+        overflow: hidden;
+      }
+      a {
+        text-decoration: none;
+      }
+      .st-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        font-family: "Josefin Slab", "Myriad Pro", Arial, sans-serif;
+      }
+
+      .st-container > input,
+      .st-container > a {
+        position: fixed;
+        bottom: 0px;
+        width: 20%;
+        cursor: pointer;
+        font-size: 16px;
+        height: 50px;
+        line-height: 50px;
+      }
+
+      .st-container > input {
+        opacity: 0;
+        z-index: 1000;
+      }
+
+      .st-container > a {
+        z-index: 10;
+        font-weight: 700;
+        background: #e23a6e;
+        color: #fff;
+        text-align: center;
+        text-shadow: 1px 1px 1px rgba(151, 24, 64, 0.2);
+      }
+
+      /* "Fix" for percentage rounding: add a background bar pseudo element with the same color like the labels */
+      .st-container:before {
+        content: "";
+        position: fixed;
+        width: 100%;
+        height: 50px;
+        background: #e23a6e;
+        z-index: 9;
+        bottom: 0;
+      }
+
+      #st-control-1,
+      #st-control-1 + a {
+        left: 0;
+      }
+
+      #st-control-2,
+      #st-control-2 + a {
+        left: 20%;
+      }
+
+      #st-control-3,
+      #st-control-3 + a {
+        left: 40%;
+      }
+
+      .st-container > input:checked + a,
+      .st-container > input:checked:hover + a {
+        background: #821134;
+      }
+
+      .st-container > input:checked + a:after,
+      .st-container > input:checked:hover + a:after {
+        bottom: 100%;
+        border: solid transparent;
+        content: "";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+        border-bottom-color: #821134;
+        border-width: 20px;
+        left: 50%;
+        margin-left: -20px;
+      }
+
+      .st-container > input:hover + a {
+        background: #ad244f;
+      }
+
+      .st-container > input:hover + a:after {
+        border-bottom-color: #ad244f;
+      }
+
+      .st-scroll,
+      .st-panel {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+
+      .st-scroll {
+        top: 0;
+        left: 0;
+        -webkit-transition: all 0.6s ease-in-out;
+        -moz-transition: all 0.6s ease-in-out;
+        -o-transition: all 0.6s ease-in-out;
+        -ms-transition: all 0.6s ease-in-out;
+        transition: all 0.6s ease-in-out;
+
+        /* Let's enforce some hardware acceleration */
+        -webkit-transform: translate3d(0, 0, 0);
+        -webkit-backface-visibility: hidden;
+      }
+
+      .st-panel {
+        background: #fff;
+        overflow: hidden;
+      }
+
+      #st-control-1:checked ~ .st-scroll {
+        -webkit-transform: translateY(0%);
+        -moz-transform: translateY(0%);
+        -o-transform: translateY(0%);
+        -ms-transform: translateY(0%);
+        transform: translateY(0%);
+      }
+      #st-control-2:checked ~ .st-scroll {
+        -webkit-transform: translateY(-100%);
+        -moz-transform: translateY(-100%);
+        -o-transform: translateY(-100%);
+        -ms-transform: translateY(-100%);
+        transform: translateY(-100%);
+      }
+      #st-control-3:checked ~ .st-scroll {
+        -webkit-transform: translateY(-200%);
+        -moz-transform: translateY(-200%);
+        -o-transform: translateY(-200%);
+        -ms-transform: translateY(-200%);
+        transform: translateY(-200%);
+      }
+
+      #container svg,
+      #container canvas {
+        position: absolute;
+        top: 100;
+      }
+      #container svg {
+        background-color: black;
+      }
+      svg text {
+        font-family: proxima-nova;
+        font-size: 16px;
+        fill: #666;
+      }
+      .countries {
+        fill: #333333;
+      }
+      .airports {
+        fill: #666666;
+      }
+
+      #title {
+        width: 800px;
+        height: 50px;
+        margin-left: 500px;
+        margin-top: 50px;
+        color: #e23a6e;
+        font-size: 25px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+      }
+
+      #heatdiv {
+        width: 800px;
+        height: 50px;
+        margin-left: 500px;
+        margin-bottom: 50px;
+        margin-top: 0px;
+        color: #e23a6e;
+        font-size: 25px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+      }
+
+      #textYear {
+        width: 400px;
+        height: 50px;
+        color: #900c3f;
+        font-size: 25px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .focus circle {
+        fill: #f1f3f3;
+        stroke: #6f257f;
+        stroke-width: 5px;
+      }
+
+      .overlay {
+        fill: none;
+        pointer-events: all;
+      }
+
+      .hover-line {
+        stroke: #6f257f;
+        stroke-width: 2px;
+        stroke-dasharray: 3, 3;
+      }
+
+      .bubbles {
+        stroke-width: 1px;
+        stroke: black;
+        opacity: 0.8;
+      }
+      .bubbles:hover {
+        stroke: black;
+      }
+
+      #bubblechart,
+      #lineChartDiv text {
+        font-size: 16px;
+      }
+
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
+
+      .y.axis path {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
+
+      .brush .extent {
+        stroke: #fff;
+        fill-opacity: 0.125;
+        shape-rendering: crispEdges;
+      }
+
+      .line {
+        fill: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- referred by [34]-->
+    <script src="d3.v4.min.js"></script>
+    <!-- Load color scale referred by [35] -->
+    <script src="d3-scale-chromatic.v1.min.js"></script>
+
+    <!-- referred by [36]-->
+    <script src="topojson.v1.min.js"></script>
+
+    <!-- referred by [37]-->
+    <script src="simpleheat.js"></script>
+    <!-- from https://github.com/mourner/simpleheat -->
+
+    <!-- section referred by [38]-->
+    <div class="container">
+      <div class="st-container">
+        <input
+          type="radio"
+          name="radio-set"
+          checked="checked"
+          id="st-control-1"
+        />
+        <a href="#graph1">Trend Chart</a>
+        <input type="radio" name="radio-set" id="st-control-2" />
+        <a href="#graph2">Heat Map</a>
+        <input type="radio" name="radio-set" id="st-control-3" />
+        <a href="#graph3">Country-wise Group</a>
+
+        <div class="st-scroll">
+          <section class="st-panel" id="graph1">
+            <div id="title">
+              Airline Accidents Trend and Prediction
+              <div id="trendtext"></div>
+            </div>
+
+            <div style="margin-left: 600px;font-size: 20px;">
+              Select year
+              <select id="year" onchange="changeYear()"></select>
+            </div>
+
+            <!-- Create a div where the graph will take place -->
+            <div
+              id="lineChartDiv"
+              style="width:1870px;height:500px;margin-top:50px;background-color:#FEECF3"
+            ></div>
+          </section>
+
+          <section class="st-panel" id="graph2">
+            <div id="heatdiv">
+              Heat Map on areas of accidents
+              <div id="textYear"></div>
+            </div>
+            <div
+              id="container"
+              style="width:960px;height:500px;margin-top:100px"
+            ></div>
+          </section>
+
+          <section class="st-panel" id="graph3">
+            <div id="title">Country wise Injuries Count</div>
+            <!-- Create a div where the graph will take place -->
+            <div id="bubblechart"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <script src="project.js"></script>
+    <!--load script file -->
+  </body>
+</html>
